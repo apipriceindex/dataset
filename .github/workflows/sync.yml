@@ -1,0 +1,24 @@
+# Sync quotidien de l'index vers Hugging Face Datasets.
+# 07:30 UTC = après le fetch prix quotidien de 06:00 (marge franche).
+# Auth : secret HF_TOKEN du repo (token write HF, déposé par Benjamin,
+# jamais dans le code). Échec du sync → le snapshot précédent reste servi.
+name: sync
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  hf:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install huggingface_hub
+      - run: python sync_hf.py
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
