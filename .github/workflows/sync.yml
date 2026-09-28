@@ -1,6 +1,6 @@
 # Sync quotidien de l'index vers Hugging Face Datasets.
 # 07:30 UTC = après le fetch prix quotidien de 06:00 (marge franche).
-# Auth : secret HF_TOKEN du repo (token write HF, déposé par Benjamin,
+# Auth : secret HF_TOKEN du repo (token write HF, déposé par Alexandre,
 # jamais dans le code). Échec du sync → le snapshot précédent reste servi.
 name: sync
 on:
