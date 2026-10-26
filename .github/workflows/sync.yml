@@ -6,10 +6,15 @@ name: sync
 on:
   schedule:
     - cron: "30 7 * * *"
+    # Maintien en vie (2026-10-26) : GitHub désactive les tâches planifiées d'un
+    # dépôt public resté 60 jours sans activité. Ce dépôt ne porte que le script :
+    # sans commit, le sync quotidien se serait arrêté seul vers fin novembre.
+    - cron: "0 8 1 * *"
   workflow_dispatch:
 
 jobs:
   hf:
+    if: github.event.schedule != '0 8 1 * *'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,3 +27,16 @@ jobs:
       - run: python sync_hf.py
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+  keepalive:
+    if: github.event.schedule == '0 8 1 * *'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "keepalive: scheduled sync stays enabled"
+          git push
